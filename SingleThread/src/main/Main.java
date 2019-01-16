@@ -21,6 +21,5 @@ public class Main {
         });
         test.run();
         newThread.run();
-
     }
 }
