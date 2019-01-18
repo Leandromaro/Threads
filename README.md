@@ -49,23 +49,24 @@ An application that creates an instance of Thread must provide the code that wil
 
 1. __Provide a Runnable object__. The Runnable interface defines a single method, run, meant to contain the code executed in the thread. The Runnable object is passed to the Thread constructor, as in the HelloRunnable example:
 
+```
+   public class HelloRunnable implements Runnable {
 
-public class HelloRunnable implements Runnable {
+       public void run() {
+           System.out.println("Hello from a thread!");
+       }
 
-    public void run() {
-        System.out.println("Hello from a thread!");
-    }
+       public static void main(String args[]) {
+           (new Thread(new HelloRunnable())).start();
+       }
 
-    public static void main(String args[]) {
-        (new Thread(new HelloRunnable())).start();
-    }
-
-}
-
+   }
+```
 
 
 1 .__Subclass Thread__. The Thread class itself implements Runnable, though its run method does nothing. An application can subclass Thread, providing its own implementation of run, as in the HelloThread example:
 
+```
 public class HelloThread extends Thread {
 
     public void run() {
@@ -77,6 +78,8 @@ public class HelloThread extends Thread {
     }
 
 }
+
+```
 Notice that both examples invoke Thread.start in order to start the new thread.
 
 Which of these idioms should you use? The first idiom, which employs a Runnable object, is more general, because the Runnable object can subclass a class other than Thread. The second idiom is easier to use in simple applications, but is limited by the fact that your task class must be a descendant of Thread. This lesson focuses on the first approach, which separates the Runnable task from the Thread object that executes the task. Not only is this approach more flexible, but it is applicable to the high-level thread management APIs covered later.
