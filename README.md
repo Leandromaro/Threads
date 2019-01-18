@@ -47,9 +47,9 @@ An inadequate solution could result in a deadlock where both processes are waiti
 ## Defining and Starting a Thread
 An application that creates an instance of Thread must provide the code that will run in that thread. There are two ways to do this:
 
-1. Provide a Runnable object. The Runnable interface defines a single method, run, meant to contain the code executed in the thread. The Runnable object is passed to the Thread constructor, as in the HelloRunnable example:
+1. __Provide a Runnable object__. The Runnable interface defines a single method, run, meant to contain the code executed in the thread. The Runnable object is passed to the Thread constructor, as in the HelloRunnable example:
 
-<pre class="prettyprint highlight" id="code-block-4"><code class="language-java" data-lang="java"><span class="pln">
+
 public class HelloRunnable implements Runnable {
 
     public void run() {
@@ -60,11 +60,11 @@ public class HelloRunnable implements Runnable {
         (new Thread(new HelloRunnable())).start();
     }
 
-}</span></code></pre>
+}
 
 
 
-Subclass Thread. The Thread class itself implements Runnable, though its run method does nothing. An application can subclass Thread, providing its own implementation of run, as in the HelloThread example:
+1 .__Subclass Thread__. The Thread class itself implements Runnable, though its run method does nothing. An application can subclass Thread, providing its own implementation of run, as in the HelloThread example:
 
 public class HelloThread extends Thread {
 
