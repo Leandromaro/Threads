@@ -48,8 +48,8 @@ An inadequate solution could result in a deadlock where both processes are waiti
 
 Each thread is associated with an instance of the class Thread. There are two basic strategies for using Thread objects to create a concurrent application.
 
-_ To directly control thread creation and management, simply instantiate __Thread__ each time the application needs to initiate an asynchronous task.
-_ To abstract thread management from the rest of your application, pass the application's tasks to an __executor__.
+ - To directly control thread creation and management, simply instantiate __Thread__ each time the application needs to initiate an asynchronous task.
+ - To abstract thread management from the rest of your application, pass the application's tasks to an __executor__.
 
 ### Defining and Starting a Thread
 An application that creates an instance of Thread must provide the code that will run in that thread. There are two ways to do this:
