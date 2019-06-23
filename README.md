@@ -44,7 +44,14 @@ To make sure that the producer won’t try to add data into the buffer if it’s
 The producer is to either go to sleep or discard data if the buffer is full. The next time the consumer removes an item from the buffer, it notifies the producer, who starts to fill the buffer again. In the same way, the consumer can go to sleep if it finds the buffer to be empty. The next time the producer puts data into the buffer, it wakes up the sleeping consumer.
 An inadequate solution could result in a deadlock where both processes are waiting to be awakened.
 
-## Defining and Starting a Thread
+## Thread Objects
+
+Each thread is associated with an instance of the class Thread. There are two basic strategies for using Thread objects to create a concurrent application.
+
+_ To directly control thread creation and management, simply instantiate __Thread__ each time the application needs to initiate an asynchronous task.
+_ To abstract thread management from the rest of your application, pass the application's tasks to an __executor__.
+
+### Defining and Starting a Thread
 An application that creates an instance of Thread must provide the code that will run in that thread. There are two ways to do this:
 
 1: __Provide a Runnable object__. The Runnable interface defines a single method, run, meant to contain the code executed in the thread. The Runnable object is passed to the Thread constructor, as in the HelloRunnable example:
