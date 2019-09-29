@@ -113,6 +113,82 @@ causes the current thread to pause execution until t's thread terminates. Overlo
 
 Like sleep, join responds to an interrupt by exiting with an InterruptedException.
 
+## Synchronization
+
+Threads communicate primarily by sharing access to fields and the objects reference fields refer to. This form of communication is extremely efficient, but makes two kinds of errors possible: __thread interference and memory consistency errors__. The tool needed to prevent these errors is synchronization.
+
+However, synchronization can introduce thread contention, which occurs when two or more threads try to access the same resource simultaneously and cause the Java runtime to execute one or more threads more slowly, or even suspend their execution. Starvation and livelock are forms of thread contention. See the section Liveness for more information.
+
+### Thread Interference
+
+```
+class Counter {
+    private int c = 0;
+
+    public void increment() {
+        c++;
+    }
+
+    public void decrement() {
+        c--;
+    }
+
+    public int value() {
+        return c;
+    }
+
+}
+```
+
+Counter is designed so that each invocation of increment will add 1 to c, and each invocation of decrement will subtract 1 from c. However, if a Counter object is referenced from multiple threads, interference between threads may prevent this from happening as expected.
+
+Interference happens when two operations, running in different threads, but acting on the same data, interleave. This means that the two operations consist of multiple steps, and the sequences of steps overlap.
+
+It might not seem possible for operations on instances of Counter to interleave, since both operations on c are single, simple statements. However, even simple statements can translate to multiple steps by the virtual machine. We won't examine the specific steps the virtual machine takes — it is enough to know that the single expression c++ can be decomposed into three steps:
+
+ - Retrieve the current value of c.
+ - Increment the retrieved value by 1.
+ - Store the incremented value back in c.
+
+The expression c-- can be decomposed the same way, except that the second step decrements instead of increments.
+
+Suppose Thread A invokes increment at about the same time Thread B invokes decrement. If the initial value of c is 0, their interleaved actions might follow this sequence:
+
+ - Thread A: Retrieve c.
+ - Thread B: Retrieve c.
+ - Thread A: Increment retrieved value; result is 1.
+ - Thread B: Decrement retrieved value; result is -1.
+ - Thread A: Store result in c; c is now 1.
+ - Thread B: Store result in c; c is now -1.
+
+Thread A's result is lost, overwritten by Thread B. This particular interleaving is only one possibility. Under different circumstances it might be Thread B's result that gets lost, or there could be no error at all. Because they are unpredictable, thread interference bugs can be difficult to detect and fix.
+
+### Memory Consistency Errors
+
+Memory consistency errors occur when different threads have inconsistent views of what should be the same data. 
+
+The key to avoiding memory consistency errors is understanding the happens-before relationship. This relationship is simply a guarantee that memory writes by one specific statement are visible to another specific statement. To see this, consider the following example. Suppose a simple int field is defined and initialized:
+```
+int counter = 0;
+```
+The counter field is shared between two threads, A and B. Suppose thread A increments counter:
+```
+counter++;
+```
+Then, shortly afterwards, thread B prints out counter:
+```
+System.out.println(counter);
+```
+If the two statements had been executed in the same thread, it would be safe to assume that the value printed out would be "1". But if the two statements are executed in separate threads, the value printed out might well be "0", because there's no guarantee that thread A's change to counter will be visible to thread B — unless the programmer has established a happens-before relationship between these two statements.
+
+There are several actions that create happens-before relationships. One of them is __synchronization__.
+
+## Synchronized Methods
+
+The Java programming language provides two basic synchronization idioms: 
+  - synchronized methods 
+  - synchronized statement
+
 
 ## Executors
 
