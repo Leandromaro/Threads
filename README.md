@@ -1,6 +1,5 @@
 # Threads
-A learning repo!
-
+A bunch of threads ideas "organized" together!
 
 ## Definitions:
 
