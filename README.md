@@ -104,7 +104,7 @@ The interrupt mechanism is implemented using an internal flag known as the inter
 
 By convention, any method that exits by throwing an InterruptedException clears interrupt status when it does so. However, it's always possible that interrupt status will immediately be set again, by another thread invoking interrupt.
 
-#### Joins
+### Joins
 
 The join method allows one thread to wait for the completion of another. If t is a Thread object whose thread is currently executing,
 ```
