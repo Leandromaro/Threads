@@ -45,6 +45,22 @@ An application that creates an instance of Thread must provide the code that wil
 
    }
 ```
+Using Java 8
+```
+Runnable task = () -> {
+    String threadName = Thread.currentThread().getName();
+    System.out.println("Hello " + threadName);
+};
+
+task.run();
+
+Thread thread = new Thread(task);
+thread.start();
+
+System.out.println("Done!");
+```
+
+Since Runnable is a functional interface we can utilize Java 8 lambda expressions to print the current threads name to the console. First we execute the runnable directly on the main thread before starting a new thread
 
 2:
 __Subclass Thread__. The Thread class itself implements Runnable, though its run method does nothing. An application can subclass Thread, providing its own implementation of run, as in the HelloThread example:
@@ -67,6 +83,44 @@ Notice that both examples invoke Thread.start in order to start the new thread.
 The first idiom, which employs a Runnable object, is more general, because the Runnable object can subclass a class other than Thread. The second idiom is easier to use in simple applications, but is limited by the fact that your task class must be a descendant of Thread. The first approach, which separates the Runnable task from the Thread object that executes the task is more flexible.
 
 The Thread class defines a number of methods useful for thread management. These include static methods, which provide information about, or affect the status of, the thread invoking the method. The other methods are invoked from other threads involved in managing the thread and Thread object.
+
+## Executors
+
+Good software techniques suggest that creating and destroying threads manually is bad practice. So java with the Concurrency API introduces the concept of an ExecutorService as a higher level replacement for working with threads directly. Executors are capable of running asynchronous tasks and typically manage a pool of threads, so we don't have to create new threads manually. All threads of the internal pool will be reused under the hood for revenant tasks, so we can run as many concurrent tasks as we want throughout the life-cycle of our application with a single executor service 
+```
+ExecutorService executor = Executors.newSingleThreadExecutor();
+executor.submit(() -> {
+    String threadName = Thread.currentThread().getName();
+    System.out.println("Hello " + threadName);
+});
+```
+The class Executors provides convenient factory methods for creating different kinds of executor services. In this sample we use an executor with a thread pool of size one.
+
+The result looks similar to the above sample but when running the code you'll notice an important difference: the java process never stops! __Executors have to be stopped explicitly__ - otherwise they keep listening for new tasks.
+
+An ExecutorService provides two methods for that purpose: shutdown() waits for currently running tasks to finish while shutdownNow() interrupts all running tasks and shut the executor down immediately.
+
+```
+try {
+    System.out.println("attempt to shutdown executor");
+    executor.shutdown();
+    executor.awaitTermination(5, TimeUnit.SECONDS);
+}
+catch (InterruptedException e) {
+    System.err.println("tasks interrupted");
+}
+finally {
+    if (!executor.isTerminated()) {
+        System.err.println("cancel non-finished tasks");
+    }
+    executor.shutdownNow();
+    System.out.println("shutdown finished");
+}
+```
+
+The executor shuts down softly by waiting a certain amount of time for termination of currently running tasks. After a maximum of five seconds the executor finally shuts down by interrupting all running tasks.
+
+
 
 ### Pausing Execution with Sleep
 
@@ -186,45 +240,42 @@ There are several actions that create happens-before relationships. One of them 
 ## Synchronized Methods
 
 The Java programming language provides two basic synchronization idioms: 
-  - synchronized methods 
-  - synchronized statement
+  - Synchronized methods 
+  - Synchronized statement
 
-
-## Executors
-
-Good software techniques suggest that creating and destroying threads manually is bad practice. So java with the Concurrency API introduces the concept of an ExecutorService as a higher level replacement for working with threads directly. Executors are capable of running asynchronous tasks and typically manage a pool of threads, so we don't have to create new threads manually. All threads of the internal pool will be reused under the hood for revenant tasks, so we can run as many concurrent tasks as we want throughout the life-cycle of our application with a single executor service 
+### Synchronized methods 
 ```
-ExecutorService executor = Executors.newSingleThreadExecutor();
-executor.submit(() -> {
-    String threadName = Thread.currentThread().getName();
-    System.out.println("Hello " + threadName);
-});
-```
-The class Executors provides convenient factory methods for creating different kinds of executor services. In this sample we use an executor with a thread pool of size one.
+public class SynchronizedCounter {
+    private int c = 0;
 
-The result looks similar to the above sample but when running the code you'll notice an important difference: the java process never stops! __Executors have to be stopped explicitly__ - otherwise they keep listening for new tasks.
-
-An ExecutorService provides two methods for that purpose: shutdown() waits for currently running tasks to finish while shutdownNow() interrupts all running tasks and shut the executor down immediately.
-
-```
-try {
-    System.out.println("attempt to shutdown executor");
-    executor.shutdown();
-    executor.awaitTermination(5, TimeUnit.SECONDS);
-}
-catch (InterruptedException e) {
-    System.err.println("tasks interrupted");
-}
-finally {
-    if (!executor.isTerminated()) {
-        System.err.println("cancel non-finished tasks");
+    public synchronized void increment() {
+        c++;
     }
-    executor.shutdownNow();
-    System.out.println("shutdown finished");
+
+    public synchronized void decrement() {
+        c--;
+    }
+
+    public synchronized int value() {
+        return c;
+    }
 }
 ```
 
-The executor shuts down softly by waiting a certain amount of time for termination of currently running tasks. After a maximum of five seconds the executor finally shuts down by interrupting all running tasks.
+If count is an instance of SynchronizedCounter, then making these methods synchronized has two effects:
+
+ - First, it is not possible for two invocations of synchronized methods on the same object to interleave. When one thread is executing a synchronized method for an object, all other threads that invoke synchronized methods for the same object block (suspend execution) until the first thread is done with the object.
+ - Second, when a synchronized method exits, it automatically establishes a happens-before relationship with any subsequent invocation of a synchronized method for the same object. This guarantees that changes to the state of the object are visible to all threads.
+
+ Synchronized methods enable a simple strategy for preventing thread interference and memory consistency errors: if an object is visible to more than one thread, all reads or writes to that object's variables are done through synchronized methods. (An important exception: final fields, which cannot be modified after the object is constructed, can be safely read through non-synchronized methods, once the object is constructed) This strategy is effective, but can present problems with __liveness__.
+
+## Intrinsic Locks and Synchronization
+
+Synchronization is built around an internal entity known as the intrinsic lock or monitor lock. (The API specification often refers to this entity simply as a "monitor.") Intrinsic locks play a role in both aspects of synchronization: enforcing exclusive access to an object's state and establishing happens-before relationships that are essential to visibility.
+
+Every object has an intrinsic lock associated with it. By convention, a thread that needs exclusive and consistent access to an object's fields has to acquire the object's intrinsic lock before accessing them, and then release the intrinsic lock when it's done with them. A thread is said to own the intrinsic lock between the time it has acquired the lock and released the lock. As long as a thread owns an intrinsic lock, no other thread can acquire the same lock. The other thread will block when it attempts to acquire the lock.
+
+When a thread releases an intrinsic lock, a happens-before relationship is established between that action and any subsequent acquisition of the same lock.
 
 ### Monitors and Semaphore
 
@@ -237,6 +288,25 @@ If the counter is already zero when a thread tries to acquire the semaphore then
 A monitor is like a public toilet. Only one person can enter at a time. They lock the door to prevent anyone else coming in, do their stuff, and then unlock it when they leave.
 
 A semaphore is like a bike hire place. They have a certain number of bikes. If you try and hire a bike and they have one free then you can take it, otherwise you must wait. When someone returns their bike then someone else can take it. If you have a bike then you can give it to someone else to return --- the bike hire place doesn't care who returns it, as long as they get their bike back.
+
+### Synchronized Statements
+
+Another way to create synchronized code is with synchronized statements. Unlike synchronized methods, synchronized statements must specify the object that provides the intrinsic lock:
+```
+public void addName(String name) {
+    synchronized(this) {
+        lastName = name;
+        nameCount++;
+    }
+    nameList.add(name);
+}
+```
+
+In this example, the addName method needs to synchronize changes to lastName and nameCount, but also needs to avoid synchronizing invocations of other objects' methods. Without synchronized statements, there would have to be a separate, unsynchronized method for the sole purpose of invoking nameList.add.
+
+### Reentrant Synchronization
+
+Recall that a thread cannot acquire a lock owned by another thread. But a thread can acquire a lock that it already owns. Allowing a thread to acquire the same lock more than once enables reentrant synchronization. This describes a situation where synchronized code, directly or indirectly, invokes a method that also contains synchronized code, and both sets of code use the same lock. Without reentrant synchronization, synchronized code would have to take many additional precautions to avoid having a thread cause itself to block.
 
 ## Producer - Consumer
 Producer–consumer problem (also known as the bounded-buffer problem) is a classic example of a multi-process synchronization problem. The problem describes two processes, the producer and the consumer, which share a common, fixed-size buffer used as a queue.
