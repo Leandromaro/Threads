@@ -334,10 +334,10 @@ Five rules for class immutability:
  5. Ensure exclusive access to any mutable components
 
  - What are the advantages of immutable object?
-Immutable objects are thread safe, because the state of that object will never be changed, so when different process/thread try to read that object will always get the same result. So it makes concurrent programming a lot cleaner and easier to write.
+   Immutable objects are thread safe, because the state of that object will never be changed, so when different process/thread try to read that object will always get the same result. So it makes concurrent programming a lot cleaner and easier to write.
 
  - What are the disadvantages of immutable object?
-Every time you want to modify an object you have to create a new one. This may cause out of memory issue when creating a lot of big/complicated objects.
+   Every time you want to modify an object you have to create a new one. This may cause out of memory issue when creating a lot of big/complicated objects.
 
 ## Producer - Consumer
 Producer–consumer problem (also known as the bounded-buffer problem) is a classic example of a multi-process synchronization problem. The problem describes two processes, the producer and the consumer, which share a common, fixed-size buffer used as a queue.
