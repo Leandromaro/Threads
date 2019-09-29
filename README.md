@@ -120,6 +120,7 @@ finally {
 
 The executor shuts down softly by waiting a certain amount of time for termination of currently running tasks. After a maximum of five seconds the executor finally shuts down by interrupting all running tasks.
 
+Deeper Executor(### Executors) information it's written abojve.
 
 ### Pausing Execution with Sleep
 
@@ -334,12 +335,23 @@ Programmers are often reluctant to employ immutable objects, because they worry 
    
       Every time you want to modify an object you have to create a new one. This may cause out of memory issue when creating a lot of big/complicated objects.
       
-      Five rules for class immutability:
-      1. Don’t provide methods that modify the object’s state
-      2. Ensure that the class can’t be extended
-      3. Make all fields final
-      4. Make all fields private
-      5. Ensure exclusive access to any mutable components
+### Five rules for class immutability:
+    1. Don’t provide methods that modify the object’s state
+    2. Ensure that the class can’t be extended
+    3. Make all fields final
+    4. Make all fields private
+    5. Ensure exclusive access to any mutable components
+
+##High Level Concurrency Objects
+
+### Lock Object
+
+Lock objects work very much like the implicit locks used by synchronized code. As with implicit locks, only one thread can own a Lock object at a time. Lock objects also support a wait/notify mechanism, through their associated Condition objects.
+
+The biggest advantage of Lock objects over implicit locks is their ability to back out of an attempt to acquire a lock. The tryLock method backs out if the lock is not available immediately or before a timeout expires (if specified). The lockInterruptibly method backs out if another thread sends an interrupt before the lock is acquired.
+
+### Executors 
+
 
 ## Producer - Consumer
 Producer–consumer problem (also known as the bounded-buffer problem) is a classic example of a multi-process synchronization problem. The problem describes two processes, the producer and the consumer, which share a common, fixed-size buffer used as a queue.
@@ -351,3 +363,9 @@ To make sure that the producer won’t try to add data into the buffer if it’s
  
 The producer is to either go to sleep or discard data if the buffer is full. The next time the consumer removes an item from the buffer, it notifies the producer, who starts to fill the buffer again. In the same way, the consumer can go to sleep if it finds the buffer to be empty. The next time the producer puts data into the buffer, it wakes up the sleeping consumer.
 An inadequate solution could result in a deadlock where both processes are waiting to be awakened.
+
+## References
+This guide has taken some examples from: 
+  - [Oracle](https://docs.oracle.com/javase/tutorial/essential/concurrency).
+  - [Winterbe](https://winterbe.com/posts/2015/04/07/java8-concurrency-tutorial-thread-executor-examples/).
+  - [Effective Java (3rd Edition)]
