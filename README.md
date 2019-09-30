@@ -120,7 +120,7 @@ finally {
 
 The executor shuts down softly by waiting a certain amount of time for termination of currently running tasks. After a maximum of five seconds the executor finally shuts down by interrupting all running tasks.
 
-Deeper Executor(#Executors) information it's written abojve.
+Deeper Executor(#advance-executors) information it's written abojve.
 
 ### Pausing Execution with Sleep
 
@@ -368,4 +368,4 @@ An inadequate solution could result in a deadlock where both processes are waiti
 This guide has taken some examples from: 
   - [Oracle](https://docs.oracle.com/javase/tutorial/essential/concurrency).
   - [Winterbe](https://winterbe.com/posts/2015/04/07/java8-concurrency-tutorial-thread-executor-examples/).
-  - [Effective Java (3rd Edition)]
+  - Effective Java (3rd Edition)
