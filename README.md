@@ -120,7 +120,7 @@ finally {
 
 The executor shuts down softly by waiting a certain amount of time for termination of currently running tasks. After a maximum of five seconds the executor finally shuts down by interrupting all running tasks.
 
-Deeper [Executor](#advance-executors) information it's written abojve.
+Deeper [Executor](#advance-executors) information it's written above.
 
 ### Pausing Execution with Sleep
 
