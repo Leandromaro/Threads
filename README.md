@@ -60,7 +60,7 @@ thread.start();
 System.out.println("Done!");
 ```
 
-Since Runnable is a functional interface we can utilize Java 8 lambda expressions to print the current threads name to the console. First we execute the runnable directly on the main thread before starting a new thread
+Since Runnable is a functional interface we can utilize Java 8 lambda expressions to print the current threads name to the console.
 
 2:
 __Subclass Thread__. The Thread class itself implements Runnable, though its run method does nothing. An application can subclass Thread, providing its own implementation of run, as in the HelloThread example:
