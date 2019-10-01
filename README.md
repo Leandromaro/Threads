@@ -342,7 +342,7 @@ Programmers are often reluctant to employ immutable objects, because they worry 
     4. Make all fields private
     5. Ensure exclusive access to any mutable components
 
-##High Level Concurrency Objects
+## High Level Concurrency Objects
 
 ### Lock Object
 
