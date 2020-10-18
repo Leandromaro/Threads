@@ -86,7 +86,7 @@ The Thread class defines a number of methods useful for thread management. These
 
 ## Executors
 
-Good software techniques suggest that __creating and destroying threads manually is bad practice__. So java with the Concurrency API introduces the concept of an ExecutorService as a higher level replacement for working with threads directly. __Executors are capable of running asynchronous tasks and typically manage a pool(#pool) of threads, so we don't have to create new threads manually__. All threads of the internal pool will be reused under the hood for revenant tasks, so we can run as many concurrent tasks as we want throughout the life-cycle of our application with a single executor service 
+Good software techniques suggest that __creating and destroying threads manually is bad practice__. So java with the Concurrency API introduces the concept of an ExecutorService as a higher level replacement for working with threads directly. __Executors are capable of running asynchronous tasks and typically manage a pool(#thread-pools) of threads, so we don't have to create new threads manually__. All threads of the internal pool will be reused under the hood for revenant tasks, so we can run as many concurrent tasks as we want throughout the life-cycle of our application with a single executor service 
 ```
 ExecutorService executor = Executors.newSingleThreadExecutor();
 executor.submit(() -> {
